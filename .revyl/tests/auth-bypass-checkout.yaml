@@ -1,17 +1,17 @@
 # Revyl Test Definition
 
 _meta:
-    remote_id: cb06579a-da09-4492-9700-0206ea0931cf
+    remote_id: b5a0d8fb-d6b1-44d9-9b84-fbed3cb5159d
     remote_version: 1
     local_version: 1
-    last_synced_at: "2026-04-29T22:55:47-07:00"
-    checksum: b106b61ea28b1043f47c46d8f20d1fa79bf57ae0157092770344fb9abe378823
+    last_synced_at: "2026-06-24T15:29:00-04:00"
+    checksum: 098fe5a652ea2fbb29eb9158b7b3c940bffaddd87a4607de0b195b0e975a8918
 test:
     metadata:
-        name: auth-bypass-checkout
+        name: auth-bypass-checkout-isaac
         platform: ios
     build:
-        name: bug-bazaar-ios-preview
+        name: bug-bazaar-ios-isaac
     variables:
         auth_bypass_token: revyl-demo-token
     env_vars:

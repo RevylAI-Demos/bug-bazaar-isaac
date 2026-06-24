@@ -1,21 +1,20 @@
 # Revyl Test Definition
-# Last synced: 2026-02-17T18:16:38-08:00
 
 _meta:
-    remote_id: 4bf5c730-fb40-47d1-93b7-08045ee3ec7b
-    remote_version: 2
-    local_version: 2
-    last_synced_at: "2026-02-17T18:16:38-08:00"
-    checksum: 9aea11387977ecf30039fae9ce40e7728dab3aa3f28059ce9e56c60911d2080c
+    remote_id: 006a7b26-42bd-457e-829e-18badd44d762
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-06-24T15:28:38-04:00"
+    checksum: 6399370daec8b5d5055a6a6127384e03c3f4037cee0b94dac96437636e6bdb91
 test:
     metadata:
-        name: filter-category-v2
+        name: filter-category-v2-isaac
         platform: ios
         tags:
             - smoke
             - filtering
     build:
-        name: bug-bazaar-ios-preview
+        name: bug-bazaar-ios-isaac
     blocks:
         - type: validation
           step_description: The shop screen is displayed with the All Bugs filter active and multiple product cards visible

@@ -1,22 +1,21 @@
 # Revyl Test Definition
-# Last synced: 2026-02-17T18:16:44-08:00
 
 _meta:
-    remote_id: e826ec57-530c-4a84-8065-b87260e184aa
-    remote_version: 2
-    local_version: 2
-    last_synced_at: "2026-02-17T18:16:43-08:00"
-    checksum: 8ced77507a5b3bcffd370401de6a62a6485c06a8aa66b6a9e59f4dbec9541501
+    remote_id: 1dcc7bf5-5fe7-4020-adc2-72b8ca43ce0b
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-06-24T15:28:48-04:00"
+    checksum: 07662cd141461d221886cde141629442087a199d997f1a02a5ce7d4528288f9a
 test:
     metadata:
-        name: orchid-mantis-cart-v2
+        name: orchid-mantis-cart-v2-isaac
         platform: ios
         tags:
             - regression
             - cart
             - bug-hunt
     build:
-        name: bug-bazaar-ios-preview
+        name: bug-bazaar-ios-isaac
     blocks:
         - type: validation
           step_description: The shop screen is displayed with product cards visible

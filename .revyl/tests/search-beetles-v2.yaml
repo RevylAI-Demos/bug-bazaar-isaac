@@ -1,21 +1,20 @@
 # Revyl Test Definition
-# Last synced: 2026-02-17T18:16:46-08:00
 
 _meta:
-    remote_id: 14ca894b-06ca-47d5-991e-81edea068c81
-    remote_version: 2
-    local_version: 2
-    last_synced_at: "2026-02-17T18:16:46-08:00"
-    checksum: ad457457c0271b773e583b3f0b3ab2bc2ec5b191d7f4e532190ea88f8c84d2fa
+    remote_id: f6a4c7f1-0d5e-48d5-9962-88da6f9e3a92
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-06-24T15:28:52-04:00"
+    checksum: 6acd467fb21a9de303f88456861a87578769f01abcc0f689a119c88f6d77254e
 test:
     metadata:
-        name: search-beetles-v2
+        name: search-beetles-v2-isaac
         platform: ios
         tags:
             - smoke
             - search
     build:
-        name: bug-bazaar-ios-preview
+        name: bug-bazaar-ios-isaac
     blocks:
         - type: instructions
           step_description: Tap the Search tab in the bottom navigation bar

@@ -1,18 +1,17 @@
 # Revyl Test Definition
-# Last synced: 2026-02-17T15:26:49-08:00
 
 _meta:
-    remote_id: 67874e51-0562-42af-85e7-7200a8b45e7d
-    remote_version: 2
-    local_version: 2
-    last_synced_at: "2026-02-17T15:26:49-08:00"
-    checksum: c04cdb8148f9c03974702ba6eaccea00af713dc3fe2447a7df21ac5dec24104e
+    remote_id: 29a92adc-d200-4ce2-9629-dca5634686d7
+    remote_version: 1
+    local_version: 1
+    last_synced_at: "2026-06-24T15:28:30-04:00"
+    checksum: eda0e0b3e78916b63a1458c37ba72842ead55413137cd19c37536db5a4df2ffe
 test:
     metadata:
-        name: search-rare
+        name: search-rare-isaac
         platform: ios
     build:
-        name: bug-bazaar-ios-preview
+        name: bug-bazaar-ios-isaac
     blocks:
         - type: validation
           step_description: The shop screen is visible with bug product cards
