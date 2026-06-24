@@ -8,7 +8,7 @@ project:
     org_id: 0ac20a4e-5baf-45a8-8e98-263575a09786
 build:
     system: Expo
-    command: npx --yes eas-cli build --platform ios --profile development-simulator --local --output build/app.tar.gz
+    command: npx --yes eas-cli build --platform ios --profile preview-simulator --local --output build/app.tar.gz
     output: build/app.tar.gz
     platforms:
         android:
@@ -16,7 +16,7 @@ build:
             output: build/app.apk
             app_id: 16114368-1ef6-4ece-84ae-50a886cf2232
         ios:
-            command: npx --yes eas-cli build --platform ios --profile development-simulator --local --output build/app.tar.gz
+            command: npx --yes eas-cli build --platform ios --profile preview-simulator --local --output build/app.tar.gz
             output: build/app.tar.gz
             app_id: 58f1da1d-7213-4d52-b1df-cbcd258dcb17
 defaults:
