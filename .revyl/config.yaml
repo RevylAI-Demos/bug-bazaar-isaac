@@ -14,11 +14,11 @@ build:
         android:
             command: npx --yes eas-cli build --platform android --profile development --local --output build/app.apk
             output: build/app.apk
-            app_id: a631bdaa-2c3b-4c77-a65e-cec0d5654539
+            app_id: 16114368-1ef6-4ece-84ae-50a886cf2232
         ios:
             command: npx --yes eas-cli build --platform ios --profile development-simulator --local --output build/app.tar.gz
             output: build/app.tar.gz
-            app_id: 00216d3b-b996-4a12-98c1-30613a4b820c
+            app_id: 58f1da1d-7213-4d52-b1df-cbcd258dcb17
 defaults:
     open_browser: true
     timeout: 1800
