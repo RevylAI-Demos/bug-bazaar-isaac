@@ -15,9 +15,17 @@ build:
             command: npx --yes eas-cli build --platform android --profile development --local --output build/app.apk
             output: build/app.apk
             app_id: 16114368-1ef6-4ece-84ae-50a886cf2232
-        ios:
+        ios-dev:
             command: npx --yes eas-cli build --platform ios --profile preview-simulator --local --output build/app.tar.gz
             output: build/app.tar.gz
+            app_id: 8e534d2e-92c2-442b-b67b-e7fbeee3a190
+        ios-ci:
+            commands:
+                - bun install
+                - bunx expo prebuild --platform ios --non-interactive
+                - cd ios && pod install && cd ..
+                - xcodebuild -workspace ios/bugbazaar.xcworkspace -scheme bugbazaar -configuration Release -sdk iphonesimulator -derivedDataPath ios/build
+            output: ios/build/Build/Products/Release-iphonesimulator/**.app
             app_id: 58f1da1d-7213-4d52-b1df-cbcd258dcb17
 defaults:
     open_browser: true

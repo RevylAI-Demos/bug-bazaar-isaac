@@ -9,3 +9,6 @@
 !config.yaml
 !tests/
 !tests/**
+
+build/
+build/**
