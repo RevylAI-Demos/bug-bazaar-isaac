@@ -8,7 +8,6 @@ When developing or changing a feature in this repo, use the Revyl dev loop to ve
 - This is an Expo dev-client app. Start with the Revyl-managed Expo loop from the repo root, using the existing `.revyl/config.yaml` when possible:
 
 ```bash
-revyl init --detect
 revyl dev --context bug-bazaar --platform ios --platform-key ios-dev \
   --launch-var REVYL_AUTH_BYPASS_ENABLED \
   --launch-var REVYL_AUTH_BYPASS_TOKEN
