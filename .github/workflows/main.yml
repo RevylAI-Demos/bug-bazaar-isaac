@@ -1,0 +1,44 @@
+name: Revyl Regression Flow
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core-flow:
+    name: Regression Flow
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Install Revyl CLI
+        run: |
+          curl -fsSL https://revyl.com/install.sh | sh
+          echo "$HOME/.revyl/bin" >> "$GITHUB_PATH"
+
+      - name: Check Revyl API key
+        env:
+          REVYL_API_KEY: ${{ secrets.REVYL_API_KEY }}
+        run: |
+          if [ -z "$REVYL_API_KEY" ]; then
+            echo "REVYL_API_KEY repository secret is required to run the Revyl core flow." >&2
+            exit 1
+          fi
+
+      - name: Run Revyl core flow
+        env:
+          REVYL_API_KEY: ${{ secrets.REVYL_API_KEY }}
+        run: |
+          revyl workflow run 8421d27a-3262-4a3b-b3eb-33abfe5fdfe5 \
+            --github-actions \
+            --timeout 600
