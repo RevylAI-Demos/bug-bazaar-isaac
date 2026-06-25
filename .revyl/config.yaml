@@ -8,7 +8,7 @@ project:
     org_id: 0ac20a4e-5baf-45a8-8e98-263575a09786
 build:
     system: Expo
-    command: npx --yes eas-cli build --platform ios --profile preview-simulator --local --output build/app.tar.gz
+    command: npx --yes eas-cli build --platform ios --profile development-simulator --local --output build/app.tar.gz
     output: build/app.tar.gz
     platforms:
         android:
@@ -16,7 +16,7 @@ build:
             output: build/app.apk
             app_id: 16114368-1ef6-4ece-84ae-50a886cf2232
         ios-dev:
-            command: npx --yes eas-cli build --platform ios --profile preview-simulator --local --output build/app.tar.gz
+            command: npx --yes eas-cli build --platform ios --profile development-simulator --local --output build/app.tar.gz
             output: build/app.tar.gz
             app_id: 8e534d2e-92c2-442b-b67b-e7fbeee3a190
         ios-ci:
@@ -42,5 +42,5 @@ hotreload:
             # Maps platform to build.platforms key for dev build resolution
             platform_keys:
                 android: android
-                ios: ios
+                ios: ios-dev
 last_synced_at: "2026-06-24T19:29:13Z"
