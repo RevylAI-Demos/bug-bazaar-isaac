@@ -26,3 +26,44 @@ revyl device navigate \
 
 - Verify the user-visible outcome with device evidence, such as `revyl device screenshot`, `revyl device report --json`, or explicit interaction through `revyl device instruction`.
 - Summarize Revyl verification in the final response: what path was exercised, what evidence was captured, and any issues or limitations. If Revyl cannot be run, state the concrete blocker and the fallback verification used.
+
+## Revyl Evidence in Pull Requests
+
+When opening or updating a PR for work where Revyl was run, include both:
+
+- An embedded Revyl screenshot showing the verified user-visible outcome.
+- A link to the Revyl report session, such as `https://app.revyl.ai/sessions/report?sessionId=<session-id>`.
+
+Do not commit Revyl screenshots to the feature branch. Store PR evidence screenshots on the asset-only `demo-assets` branch and reference the raw image URL from the PR body.
+
+Recommended flow after capturing a screenshot:
+
+```bash
+# From the feature branch, capture a screenshot outside the repo.
+revyl device screenshot --out /tmp/<pr-slug>-revyl.png -s <device-index>
+
+# Create or update an isolated worktree for the asset branch.
+git fetch origin demo-assets
+git worktree add /tmp/bug-bazaar-demo-assets origin/demo-assets
+cd /tmp/bug-bazaar-demo-assets
+git switch -c demo-assets --track origin/demo-assets 2>/dev/null || git switch demo-assets
+
+# Add the screenshot under a PR-specific path and push it.
+mkdir -p pr-<number>
+cp /tmp/<pr-slug>-revyl.png pr-<number>/<short-description>.png
+git add pr-<number>/<short-description>.png
+git commit -m "add PR <number> revyl screenshot"
+git push origin demo-assets
+```
+
+Then embed the asset in the PR body:
+
+```markdown
+## Revyl Verification
+
+- Report session: https://app.revyl.ai/sessions/report?sessionId=<session-id>
+
+![Revyl verification screenshot](https://raw.githubusercontent.com/RevylAI/bug-bazaar-isaac/demo-assets/pr-<number>/<short-description>.png)
+```
+
+If the PR number is not known yet, open the draft PR first with the Revyl report link, then add the screenshot to `demo-assets/pr-<number>/...` and update the PR body.
