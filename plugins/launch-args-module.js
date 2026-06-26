@@ -45,7 +45,7 @@ class LaunchArgsModule(reactContext: ReactApplicationContext) : ReactContextBase
   fun getLaunchArguments(promise: Promise) {
     try {
       val args: WritableArray = Arguments.createArray()
-      val extras = currentActivity?.intent?.extras
+      val extras = reactApplicationContext.currentActivity?.intent?.extras
 
       if (extras != null) {
         for (key in extras.keySet()) {
