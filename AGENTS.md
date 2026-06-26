@@ -33,7 +33,7 @@ When opening or updating a PR for work where Revyl was run, include both:
 - An embedded Revyl screenshot showing the verified user-visible outcome.
 - A link to the Revyl report session, such as `https://app.revyl.ai/sessions/report?sessionId=<session-id>`.
 
-Do not commit Revyl screenshots to the feature branch. Store PR evidence screenshots on the asset-only `demo-assets` branch and reference the raw image URL from the PR body.
+Do not commit Revyl screenshots to the feature branch. Store PR evidence screenshots on the asset-only `demo-assets` branch and reference the raw image URL from the PR body. The raw image URL should be in the following format: `https://github.com/<owner>/<repo>/blob/<branch>/<path to image>?raw=true` because this is a private repo. 
 
 Recommended flow after capturing a screenshot:
 
