@@ -6,9 +6,15 @@ This is an Expo (SDK 54) dev-client React Native app. Dependencies install with 
 
 Running the app in the cloud VM:
 
-- There is no iOS/Android simulator here. Run and verify locally with **Expo web**: `npx expo start --web` (serves at `http://localhost:8081`). The primary on-device feature-verification path remains the Revyl dev loop described below, which needs the Revyl CLI (not preinstalled) plus `REVYL_API_KEY`.
+- There is no iOS/Android simulator here. Run and verify locally with **Expo web**: `npx expo start --web` (serves at `http://localhost:8081`). The primary on-device feature-verification path is the Revyl dev loop described below.
 - Do NOT use the `npm` scripts (`npm start`, `npm run web`, `npm run ios`, `npm run android`): their `pre*` hooks run `node scripts/check-node-version.js`, but `scripts/` does not exist in the repo, so those scripts fail. Invoke `npx expo start ...` directly to bypass the missing hook.
 - Web rendering requires `react-dom` and `react-native-web`, which are NOT in `package.json`. The startup update script installs them via `npm install --no-save react-dom@19.1.0 react-native-web@^0.21.0`; if web fails to start with a "missing web dependencies" error, re-run that command.
+
+Revyl CLI (for the on-device dev loop below):
+
+- The `revyl` CLI is preinstalled by the startup update script to `/usr/local/bin/revyl` (already on `PATH`). If it is ever missing, reinstall with: `sudo env REVYL_INSTALL_DIR=/usr/local/bin REVYL_NO_MODIFY_PATH=1 sh -c "$(curl -fsSL https://revyl.com/install.sh)"`.
+- Auth is automatic via the injected `REVYL_API_KEY` secret (`revyl auth status` shows `Auth Method: env`); no `revyl auth login` or `~/.revyl/credentials.json` is needed. If `REVYL_API_KEY` is unset, add it in the Cloud Agent Secrets panel.
+- Building the Expo dev client for a Revyl device uses local EAS builds (`.revyl/config.yaml`), which require native platform toolchains not present in this VM; prefer running against an existing cloud build/device rather than building here.
 
 Checks:
 
