@@ -66,3 +66,16 @@ Then embed the asset in the PR body:
 ```
 
 If the PR number is not known yet, open the draft PR first with the Revyl report link, then add the screenshot to `demo-assets/pr-<number>/...` and update the PR body.
+
+## Cursor Cloud specific instructions
+
+This is an Expo (SDK 54) dev-client app whose primary dev/test loop targets iOS/Android via Revyl cloud devices (see Revyl sections above). In the Cursor Cloud VM there are **no iOS/Android simulators and no Revyl credentials** (`REVYL_API_KEY` is not set), so native builds and the Revyl loop cannot run here. Verify JS/TS/UI changes by running the app as **Expo web** in the VM and driving it in a browser.
+
+- **Run the app (web):** `npx expo start --web --port 8081`, then open `http://localhost:8081`. Node 22 (`.nvmrc`) matches `engines`.
+- **Do NOT use the `npm run` scripts** (`start`/`web`/`ios`/`android`). Their `pre*` hooks call `node scripts/check-node-version.js`, and that file does not exist in the repo, so every `npm run` script fails immediately. Invoke `expo` directly with `npx expo ...` instead.
+- **Package manager:** use `npm` (README + `package-lock.json`). A `bun.lock` also exists, so Expo/EAS auto-detect bun for `expo install`/lint; since bun is not installed here, add deps with `npm install <pkg>` directly rather than `npx expo install`.
+- **Web runtime deps** (`react-dom`, `react-native-web`, `@expo/metro-runtime`) are required for `expo start --web` and are declared in `package.json`.
+- **Typecheck:** `npx tsc --noEmit`. Pre-existing errors under `demo/versions/**` are a scratch folder with intentionally broken relative imports; they are unrelated to the shippable app (`app/`, `components/`, `constants/`, `context/`).
+- **Lint / tests:** none are configured (no ESLint config, no lint script, no test framework). `npx expo lint` tries to auto-install ESLint via bun and fails; don't rely on it.
+- **Checkout flow needs sign-in:** the auth screen is pre-filled with a demo collector account, or use the auth-bypass deep link documented above. The "Missing auth state" chip on the auth screen is the normal idle indicator, not an error.
+- Web rendering of this mobile layout shows cosmetic quirks at desktop width (wide whitespace, a solid hero-banner block); these are not functional bugs.
