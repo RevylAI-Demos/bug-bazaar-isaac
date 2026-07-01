@@ -69,7 +69,10 @@ If the PR number is not known yet, open the draft PR first with the Revyl report
 
 ## Cursor Cloud specific instructions
 
-This is an Expo (SDK 54) dev-client app whose primary dev/test loop targets iOS/Android via Revyl cloud devices (see Revyl sections above). In the Cursor Cloud VM there are **no iOS/Android simulators and no Revyl credentials** (`REVYL_API_KEY` is not set), so native builds and the Revyl loop cannot run here. Verify JS/TS/UI changes by running the app as **Expo web** in the VM and driving it in a browser.
+This is an Expo (SDK 54) dev-client app whose primary dev/test loop targets iOS/Android via Revyl cloud devices (see Revyl sections above). Two verification paths exist in the Cursor Cloud VM:
+
+- **Revyl cloud device loop (primary):** `REVYL_API_KEY` is provided as a secret and the Revyl CLI is installed to `~/.revyl/bin` (already on `PATH` via `~/.bashrc`; the startup script reinstalls it if missing). The CLI auto-authenticates from `REVYL_API_KEY` (`revyl auth status` / `revyl ping` to confirm). Use it per the Revyl sections above and the `revyl-cli-dev-loop` skill. There are still **no local iOS/Android simulators**, so native builds run via EAS/Revyl, not on this VM.
+- **Expo web (lightweight local check):** for quick JS/TS/UI verification without a device, run the app as web and drive it in a browser.
 
 - **Run the app (web):** `npx expo start --web --port 8081`, then open `http://localhost:8081`. Node 22 (`.nvmrc`) matches `engines`.
 - **Do NOT use the `npm run` scripts** (`start`/`web`/`ios`/`android`). Their `pre*` hooks call `node scripts/check-node-version.js`, and that file does not exist in the repo, so every `npm run` script fails immediately. Invoke `expo` directly with `npx expo ...` instead.
