@@ -1,5 +1,31 @@
 # Agent Guidance
 
+## Cursor Cloud specific instructions
+
+This is an Expo (SDK 54) dev-client React Native app. Dependencies install with `npm install` (see `README.md`; `package-lock.json` + `.npmrc legacy-peer-deps` are authoritative — do not use `bun` despite `bun.lock`). Node 22 (`.nvmrc`).
+
+Running the app in the cloud VM:
+
+- The primary on-device feature-verification path is the Revyl dev loop described below.
+- Do NOT use the `npm` scripts (`npm start`, `npm run web`, `npm run ios`, `npm run android`): their `pre*` hooks run `node scripts/check-node-version.js`, but `scripts/` does not exist in the repo, so those scripts fail. Invoke `npx expo start ...` directly to bypass the missing hook.
+
+Revyl CLI (for the on-device dev loop below):
+
+- The `revyl` CLI is preinstalled by the startup update script to `/usr/local/bin/revyl` (already on `PATH`). If it is ever missing, reinstall with: `sudo env REVYL_INSTALL_DIR=/usr/local/bin REVYL_NO_MODIFY_PATH=1 sh -c "$(curl -fsSL https://revyl.com/install.sh)"`.
+- Auth is automatic via the injected `REVYL_API_KEY` secret (`revyl auth status` shows `Auth Method: env`); no `revyl auth login` or `~/.revyl/credentials.json` is needed. If `REVYL_API_KEY` is unset, add it in the Cloud Agent Secrets panel.
+- See below on how to build the app using Revyl
+
+Checks:
+
+- No lint or test tooling is configured (no ESLint, no test runner). The type check is `npx tsc --noEmit`.
+- `npx tsc --noEmit` reports pre-existing errors ONLY in `demo/versions/*.tsx` (scratch alternate components with wrong relative import paths); these are not part of the app and can be ignored. The app code under `app/`, `components/`, `context/`, `constants/` is clean.
+
+## Revyl Builds
+
+When a new branch is created, the app should be rebuilt. 
+- The VM does not have native platform toolchains not present.
+- It should be built using a remote Revyl build with the command: `revyl build --remote`
+
 ## Revyl Verification
 
 When developing or changing a feature in this repo, use the Revyl dev loop to verify the behavior on a device before finishing.
