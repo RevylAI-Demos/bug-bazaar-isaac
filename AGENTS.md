@@ -20,15 +20,11 @@ Checks:
 - No lint or test tooling is configured (no ESLint, no test runner). The type check is `npx tsc --noEmit`.
 - `npx tsc --noEmit` reports pre-existing errors ONLY in `demo/versions/*.tsx` (scratch alternate components with wrong relative import paths); these are not part of the app and can be ignored. The app code under `app/`, `components/`, `context/`, `constants/` is clean.
 
-## Revyl Builds
-
-When a new branch is created, the app should be rebuilt. 
-- The VM does not have native platform toolchains not present.
-- It should be built using a remote Revyl build with the command: `revyl build --remote`
-
 ## Revyl Verification
 
 When developing or changing a feature in this repo, use the Revyl dev loop to verify the behavior on a device before finishing.
+
+First run a new build using `revyl build --remote` as this VM does not have native platform toolchains not present.
 
 - Read and follow the local `revyl-cli-dev-loop` skill guidance before running Revyl commands.
 - This is an Expo dev-client app. Start with the Revyl-managed Expo loop from the repo root, using the existing `.revyl/config.yaml` when possible:
