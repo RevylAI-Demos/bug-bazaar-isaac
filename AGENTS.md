@@ -1,5 +1,20 @@
 # Agent Guidance
 
+## Cursor Cloud specific instructions
+
+This is an Expo (SDK 54) dev-client React Native app. Dependencies install with `npm install` (see `README.md`; `package-lock.json` + `.npmrc legacy-peer-deps` are authoritative — do not use `bun` despite `bun.lock`). Node 22 (`.nvmrc`).
+
+Running the app in the cloud VM:
+
+- There is no iOS/Android simulator here. Run and verify locally with **Expo web**: `npx expo start --web` (serves at `http://localhost:8081`). The primary on-device feature-verification path remains the Revyl dev loop described below, which needs the Revyl CLI (not preinstalled) plus `REVYL_API_KEY`.
+- Do NOT use the `npm` scripts (`npm start`, `npm run web`, `npm run ios`, `npm run android`): their `pre*` hooks run `node scripts/check-node-version.js`, but `scripts/` does not exist in the repo, so those scripts fail. Invoke `npx expo start ...` directly to bypass the missing hook.
+- Web rendering requires `react-dom` and `react-native-web`, which are NOT in `package.json`. The startup update script installs them via `npm install --no-save react-dom@19.1.0 react-native-web@^0.21.0`; if web fails to start with a "missing web dependencies" error, re-run that command.
+
+Checks:
+
+- No lint or test tooling is configured (no ESLint, no test runner). The type check is `npx tsc --noEmit`.
+- `npx tsc --noEmit` reports pre-existing errors ONLY in `demo/versions/*.tsx` (scratch alternate components with wrong relative import paths); these are not part of the app and can be ignored. The app code under `app/`, `components/`, `context/`, `constants/` is clean.
+
 ## Revyl Verification
 
 When developing or changing a feature in this repo, use the Revyl dev loop to verify the behavior on a device before finishing.
