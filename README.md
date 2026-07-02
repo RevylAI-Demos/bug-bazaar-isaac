@@ -2,7 +2,7 @@
 
 Bug Bazaar is a richer Expo sample app for dogfooding Revyl flows against a real product shape: search, product detail pages, cart, checkout, account state, and a first-party auth screen.
 
-It is also the reference app for Revyl auth-bypass deep links.
+It is also the reference app for Revyl auth-bypass deep links. 
 
 ## Auth Bypass Deep Link Sample
 
