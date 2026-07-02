@@ -20,6 +20,12 @@ Checks:
 - No lint or test tooling is configured (no ESLint, no test runner). The type check is `npx tsc --noEmit`.
 - `npx tsc --noEmit` reports pre-existing errors ONLY in `demo/versions/*.tsx` (scratch alternate components with wrong relative import paths); these are not part of the app and can be ignored. The app code under `app/`, `components/`, `context/`, `constants/` is clean.
 
+## Bugs Flows
+
+**If this is a Bug report and the ticket contains Build information: FIRST record the steps to reproduce the bug using a Revyl session.**
+
+Before implementing any changes, use Revyl to record the exact user flow dictated by the user. Use the build that is described in the ticket to start the Revyl session. **Make sure to add the link to this completed session in the PR when it gets opened up**
+
 ## Revyl Verification
 
 When developing or changing a feature in this repo, use the Revyl dev loop to verify the behavior on a device before finishing.
@@ -88,7 +94,3 @@ Then embed the asset in the PR body:
 ```
 
 If the PR number is not known yet, open the draft PR first with the Revyl report link, then add the screenshot to `demo-assets/pr-<number>/...` and update the PR body.
-
-## Bugs Flows
-
-If this is a Bug report and the ticket contains Build information and the steps to reproduce the bug then we first want to record what the user is seeing. Before implementing any changes, use Revyl to record the exact user flow dictated by the user. Use the build that is described in the ticket to start the Revyl session.
