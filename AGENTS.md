@@ -88,3 +88,7 @@ Then embed the asset in the PR body:
 ```
 
 If the PR number is not known yet, open the draft PR first with the Revyl report link, then add the screenshot to `demo-assets/pr-<number>/...` and update the PR body.
+
+## Bugs Flows
+
+If this is a Bug report and the ticket contains Build information and the steps to reproduce the bug then we first want to record what the user is seeing. Before implementing any changes, use Revyl to record the exact user flow dictated by the user. Use the build that is described in the ticket to start the Revyl session.
