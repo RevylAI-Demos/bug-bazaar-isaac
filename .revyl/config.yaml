@@ -12,8 +12,11 @@ build:
     output: build/app.tar.gz
     platforms:
         android:
-            command: npx --yes eas-cli build --platform android --profile development --local --output build/app.apk
-            output: build/app.apk
+            commands: 
+                - npm install
+                - npx expo prebuild --platform android --non-interactive
+                - cd android && ./gradlew assembleDebug && cd ..
+            output: android/app/build/outputs/apk/debug/app-debug.apk
             app_id: 16114368-1ef6-4ece-84ae-50a886cf2232
         ios-dev:
             command: npx --yes eas-cli build --platform ios --profile development-simulator --local --output build/app.tar.gz

@@ -5,6 +5,14 @@ description: Create robust Revyl E2E tests using CLI commands from app source an
 
 # Revyl CLI Test Authoring Skill
 
+## Native Agent Behavior
+
+- Ask at most 1-3 concise clarification questions only when the target app, platform, session, URL, or sensitive action cannot be inferred from the repo or Revyl CLI.
+- Prefer safe defaults and keep moving when `revyl init --detect`, `revyl app list`, `revyl test list`, screenshots, or reports can answer the question.
+- When Revyl prints an editor, report, viewer, or local app URL, open it in the native browser/tool surface when available: Codex Browser/in-app browser for local URLs, Revyl editor/report URLs, screenshots, and page checks; Claude Code `.claude/skills` slash-command discovery plus WebFetch/WebSearch or configured MCP/browser tools; Cursor `.cursor/skills` plus `.cursor/rules/revyl-skills.mdc` and available MCP/browser tools.
+- If no browser tool is exposed, report the URL and verify through `revyl test report`, `revyl device screenshot`, or `revyl device report` instead of claiming browser access.
+- Confirm before entering sensitive data, submitting forms, uploading files, accepting browser permissions, changing sharing/access, or deleting data.
+
 ## End-to-End Authoring Loop
 
 ```bash
@@ -12,17 +20,14 @@ description: Create robust Revyl E2E tests using CLI commands from app source an
 revyl auth status
 revyl app list --platform <ios|android>
 
-# 2) Author YAML locally, then validate it
-revyl test validate ./<test-name>.yaml
-
-# 3) Create from YAML (bootstraps .revyl/tests/ and config)
+# 2) Create from YAML (bootstraps .revyl/tests/ and config)
 revyl test create <test-name> --from-file ./<test-name>.yaml
 
-# 4) Iterate on .revyl/tests/<test-name>.yaml, then push and run
+# 3) Iterate on .revyl/tests/<test-name>.yaml, then push and run
 revyl test push <test-name> --force
 revyl test run <test-name>
 
-# 5) Inspect results and refine
+# 4) Inspect results and refine
 revyl test status <test-name>
 revyl test report <test-name> --json
 ```
@@ -33,7 +38,7 @@ YAML-first bootstrap works without an existing `.revyl/config.yaml`:
 revyl test create <test-name> --from-file ./test.yaml
 ```
 
-The CLI validates the YAML, copies it into `.revyl/tests/`, pushes it, and writes `.revyl/config.yaml` after the remote test is created.
+The CLI checks the YAML with backend validation, copies it into `.revyl/tests/`, pushes it, and writes `.revyl/config.yaml` after the remote test is created.
 
 If you prefer to scaffold first:
 
@@ -57,13 +62,15 @@ For full examples and troubleshooting, see `docs/tests/creating-tests.md`.
 If this test comes from a running `revyl dev` session:
 
 ```bash
-revyl dev test create <test-name> --platform ios
-revyl dev test open <test-name>
+revyl device screenshot --out /tmp/revyl-current.png
+revyl device report --session-id <session-id> --json
 ```
+
+Then author YAML explicitly and create it with `revyl test create --from-file`. Put repeated setup such as login, onboarding, or seed data in a reusable module/setup block so feature tests do not duplicate it.
 
 ## Tool Map
 
-- Tests: `revyl test validate`, `create`, `push`, `run`, `report`, `status`, and `history`.
+- Tests: `revyl test create`, `push`, `run`, `report`, `status`, and `history`.
 - Modules: `revyl module create/list/get/update/usage/insert` for reusable block groups.
 - Scripts: `revyl script create/list/get/update/usage/insert` for `code_execution` blocks.
 - Variables: `test.variables`, `revyl test var`, `revyl global var`, `extraction.variable_name`, and `code_execution.variable_name`.
@@ -107,12 +114,12 @@ Use these block types:
 - Local YAML variables go under `test.variables` and are referenced as `{{variable-name}}` or `{{variable_name}}`.
 - Extracted values and code execution output become variables when the block has `variable_name`.
 - Test-scoped variables can be managed after creation with `revyl test var set/list/get/delete`.
-- Org-level secrets use `revyl global var set name=value` and are referenced as `{{global.name}}`.
+- Org-level secrets use `revyl global var set name=value --secret` and are referenced as `{{global.name}}`.
 - Define or extract variables before use. Never hardcode secrets in reusable YAML or modules.
 
 ```bash
 revyl test var set <test-name> email=test@example.com
-revyl global var set login-password='secret'
+revyl global var set login-password='secret' --secret
 revyl global launch-var create API_URL=https://staging.example.com
 ```
 
@@ -130,12 +137,13 @@ Use the snippet from `revyl script insert`, or write the block directly:
 
 ```yaml
 - type: code_execution
-  step_description: "seed-user"
   script: "seed-user"
   variable_name: seeded_user_id
 ```
 
-Use inline code only for small one-offs:
+Legacy YAML may use `step_description` to hold an internal script UUID, but new authored YAML should use `script`.
+
+Use inline code only for small one-offs when a saved script would be unnecessary:
 
 ```yaml
 - type: code_execution
@@ -167,9 +175,10 @@ Import with the snippet from `revyl module insert`:
 
 ```yaml
 - type: module_import
-  step_description: "login-flow"
-  module_id: "65c5ac48-b980-43c7-a78e-e58b0daf183b"
+  module: "login-flow"
 ```
+
+Legacy YAML may use `module_id` to hold an internal module UUID, but new authored YAML should use `module`.
 
 ## Full Flow Example
 
@@ -188,13 +197,11 @@ test:
     product-name: Orchid Mantis
   blocks:
     - type: code_execution
-      step_description: "seed-checkout-user"
       script: "seed-checkout-user"
       variable_name: seeded_user_id
 
     - type: module_import
-      step_description: "login-flow"
-      module_id: "65c5ac48-b980-43c7-a78e-e58b0daf183b"
+      module: "login-flow"
 
     - type: instructions
       step_description: "Complete checkout for {{product-name}} using the saved shipping address."
@@ -207,14 +214,13 @@ test:
 
 ## Conversion Rules
 
-1. Write instruction steps at the level of a meaningful user intent, not every tiny tap or keystroke.
-2. Prefer one free-form instruction followed by one validation for the important outcome it should produce.
-3. Add validations at stable checkpoints and final outcomes. Do not validate after every small interaction.
-4. Keep validations in separate `validation` blocks from the instruction that caused the state change.
-5. Validate durable user-facing behavior, not transient loading text, animations, timing artifacts, or implementation details.
-6. Replace secrets with variables.
-7. Use `module_import` blocks for reusable setup like login or onboarding.
-8. Use `code_execution` for API setup, data seeding, backend checks, and deterministic helper logic.
+1. One action per instruction step.
+2. Keep validation in separate validation steps.
+3. Validate user-facing outcomes, not transient loading text.
+4. Replace secrets with variables or global variables.
+5. Use `module_import` blocks for reusable setup like login or onboarding.
+6. Preserve the exact target language that worked in the device report when it is more specific than a generic tap.
+7. Use `code_execution` for API setup, data seeding, backend checks, and deterministic helper logic.
 
 Good:
 

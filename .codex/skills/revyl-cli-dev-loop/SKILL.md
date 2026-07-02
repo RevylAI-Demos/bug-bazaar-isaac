@@ -7,6 +7,14 @@ description: Generic CLI-first Revyl dev loop for hot reload, rebuild-loop, and 
 
 Use this skill when the user wants the generic Revyl CLI dev loop instead of MCP tool-by-tool orchestration. Start from the app's real stack, keep the session running, and use the device as the source of truth.
 
+## Native Agent Behavior
+
+- Ask at most 1-3 concise clarification questions only when the target app, platform, session, URL, or sensitive action cannot be inferred from the repo or Revyl CLI.
+- Prefer safe defaults and keep moving when `revyl init --detect`, `revyl dev list`, `revyl app list`, screenshots, or reports can answer the question.
+- When Revyl prints a viewer or local app URL, open it in the native browser/tool surface when available: Codex Browser/in-app browser for local URLs, Revyl viewer URLs, screenshots, and page checks; Claude Code `.claude/skills` slash-command discovery plus WebFetch/WebSearch or configured MCP/browser tools; Cursor `.cursor/skills` plus `.cursor/rules/revyl-skills.mdc` and available MCP/browser tools.
+- If no browser tool is exposed, report the URL and verify through `revyl device screenshot` or `revyl device report` instead of claiming browser access.
+- Confirm before entering sensitive data, submitting forms, uploading files, accepting browser permissions, changing sharing/access, or deleting data.
+
 ## Detect and Start
 
 ```bash
@@ -35,31 +43,41 @@ In monorepos, run Revyl from the actual app directory, not the workspace root. F
 
 ## Start or Attach
 
-Use normal `revyl dev` for a new loop. Attach only when you are intentionally
-reusing an already-running device session.
+Use normal `revyl dev` for new work. Contexts are worktree-local; separate
+worktrees can each use the default context. If another loop is already running
+in the same worktree, Revyl auto-selects a safe branch/platform context name
+and prints it. Pass `--context <name>` only when deliberately targeting a known
+loop.
 
 ```bash
-# Discover existing state before reusing a device.
+# New loop: let Revyl provision the device and choose any needed context name.
+revyl dev
+
+# Inspect or switch named contexts only when you need to target one explicitly.
 revyl dev list
-revyl device list
-
-# New loop: let Revyl provision the device.
+revyl dev use <name>
 revyl dev --context <name>
+```
 
+Attach only when you are intentionally reusing an already-running device
+session:
+
+```bash
 # Reuse the current active session only when it is unambiguous.
 revyl dev attach active --context <name>
-revyl dev --context <name>
+revyl dev
 
 # If multiple sessions exist, attach by explicit session id or index.
 revyl dev attach <session-id> --context <name>
 revyl dev attach <index> --context <name>
-revyl dev --context <name>
+revyl dev
 ```
 
 `active` is a convenience shortcut for the current running device session. Do
 not use it when multiple sessions exist or when the desired session is unclear.
-After attaching a session to a context, run `revyl dev --context <name>` to
-start the loop on that session.
+After attaching a session to a context, run `revyl dev` from that worktree to
+start the loop on that session, or pass `--context <name>` if you need to
+target the attached context explicitly.
 
 ## Framework Guidance
 
@@ -68,7 +86,8 @@ start the loop on that session.
   dependencies, permissions, or URL scheme registration changes. Try an
   external Expo tunnel only after screenshots or reports show the Revyl relay,
   app load, or HMR path failed. If repeated web auth is slowing stable Expo
-  testing, install and use `revyl-cli-auth-bypass-expo`; implement the
+  testing, install and use `revyl-cli-auth-bypass`; let it detect the stack and
+  delegate to `revyl-cli-auth-bypass-expo` for Expo app code. Implement the
   test-only bypass in the app first, start `revyl dev` with
   `--launch-var REVYL_AUTH_BYPASS_ENABLED --launch-var REVYL_AUTH_BYPASS_TOKEN`,
   wait for the normal Expo app UI, then open the app-specific `revyl-auth`
@@ -92,6 +111,10 @@ start the loop on that session.
   configured build command, `revyl dev rebuild --wait`, and device verification.
 - Monorepos: if detection is confused by hoisted dependencies or nested native folders, run from the app directory and force the provider only when needed.
 
+If repeated login slows exploration on any stack, use `revyl-cli-auth-bypass`
+first. It detects the app stack and delegates to the matching platform leaf
+before this dev-loop skill starts the session with bypass launch vars.
+
 ## Observe, Act, Verify
 
 Use screenshots and reports to decide what happened before changing strategy.
@@ -110,9 +133,9 @@ During exploration, capture the exact path that worked. Describe actions with vi
 
 ## Expo Auth Bypass
 
-For Expo apps that have implemented the `revyl-cli-auth-bypass-expo` pattern,
-start the dev loop with the bypass launch vars and then navigate after the app
-loads normally:
+For apps that have implemented the `revyl-cli-auth-bypass` contract, start the
+dev loop with the bypass launch vars and then navigate after the app loads
+normally:
 
 ```bash
 # One-time setup if the launch vars do not already exist.
@@ -120,9 +143,7 @@ export REVYL_AUTH_BYPASS_TOKEN="<test-only-token>"
 revyl global launch-var create REVYL_AUTH_BYPASS_ENABLED=true
 revyl global launch-var create REVYL_AUTH_BYPASS_TOKEN="$REVYL_AUTH_BYPASS_TOKEN"
 
-export REVYL_CONTEXT="${USER:-agent}-expo-auth-$$"
-
-revyl dev --context "$REVYL_CONTEXT" --no-build \
+revyl dev --no-build \
   --launch-var REVYL_AUTH_BYPASS_ENABLED \
   --launch-var REVYL_AUTH_BYPASS_TOKEN
 ```
@@ -137,9 +158,10 @@ revyl device screenshot --out /tmp/revyl-auth-bypass.png
 ```
 
 If the app has not implemented the handler yet, install/use
-`revyl-cli-auth-bypass-expo` first. If the device session was reused, launch
-vars may not have applied; run `revyl dev stop --context "$REVYL_CONTEXT"` and
-start a fresh loop with the launch vars.
+`revyl-cli-auth-bypass` first. It will delegate to `revyl-cli-auth-bypass-expo`
+when the app is Expo or Expo Router. If the device session was reused, launch
+vars may not have applied; use the context name printed by `revyl dev`, stop it
+with `revyl dev stop <context>`, and start a fresh loop with the launch vars.
 
 ## Guardrails
 
@@ -168,10 +190,11 @@ start a fresh loop with the launch vars.
    TTY. In agent shells, use `revyl dev rebuild`, `revyl dev stop`, or restart
    the loop instead.
 6. **Attaching to an existing session** -- if no suitable session exists, run
-   `revyl dev` normally. If exactly one relevant current session exists, attach
-   it with `revyl dev attach active --context <name>`, then start the loop with
-   `revyl dev --context <name>`. If multiple sessions exist, use an explicit
-   session id or index; do not guess.
+   `revyl dev` normally and let Revyl choose the context. If exactly one
+   relevant current session exists, attach it with
+   `revyl dev attach active --context <name>`, then start with `revyl dev`.
+   If multiple sessions exist, use an explicit session id or index; do not
+   guess.
 7. **Keep logs concise** -- use `revyl dev --debug` only for relay/HMR
    troubleshooting. When reporting results, summarize the state transitions and
    include only the first actionable error, relevant relay/session IDs, and a
@@ -184,14 +207,12 @@ In Cursor or similar cloud-agent environments, start with the Revyl-managed
 relay:
 
 ```bash
-export REVYL_CONTEXT="${REVYL_CONTEXT:-revyl-dev-loop}"
-revyl dev --context "$REVYL_CONTEXT" --no-build --app-id <app-id>
+revyl dev --no-build --app-id <app-id>
 ```
 
-If you need to define the context yourself, set or export it before the
-`revyl dev` command. Avoid inline shell assignment such as
-`REVYL_CONTEXT=name revyl dev --context "$REVYL_CONTEXT"` because many shells
-expand `$REVYL_CONTEXT` before the inline assignment takes effect.
+If you need to target a specific existing loop, inspect contexts first with
+`revyl dev list`, then run `revyl dev --context <name>`. Do not predefine a
+context for normal startup; Revyl will pick one when the worktree needs it.
 
 For Expo and bare React Native, this lets Revyl own Metro/Expo startup, relay
 creation, dev-client install, and the deep link opened on the cloud device. If
@@ -202,7 +223,8 @@ If startup fails with `failed to create relay session: unauthorized` after
 `Backend relay connectivity OK`, do not assume the developer needs to log in
 again. First run `revyl auth status` and `revyl ping`; if both pass, capture a
 `revyl dev --debug` run and treat it as a Revyl relay/backend issue. For Expo
-dev-client projects, try the external tunnel fallback to keep the user moving.
+dev-client projects, use `--force-hot-reload` first when Revyl verifies relay
+transport but cannot prove Expo manifest readiness.
 
 After `Dev loop ready`, keep the process running. Treat `Viewer:` and the
 relay/deep-link host printed by `revyl dev` as the active relay session; in
@@ -210,6 +232,18 @@ production this may be `relay.revyl.ai`, while local or branch environments may
 use a generated relay/ngrok host. Do not stop the relay because of HMR
 diagnostic warnings; normal runs hide advisory HMR diagnostics, and
 `revyl dev --debug` is for relay/HMR troubleshooting.
+
+For Expo manifest readiness timeouts, use diagnostic launch mode before
+switching transports:
+
+```bash
+revyl dev --platform ios --force-hot-reload
+```
+
+This still requires Expo startup and Revyl relay transport to succeed. It skips
+only the manifest and bundle proof so the cloud device can be the source of
+truth. If the app loads, keep working. If the dev client shows a project load
+error, restart Expo/Metro or capture a report.
 
 Before switching to Expo tunnel fallback, gather device evidence:
 
@@ -240,13 +274,13 @@ revyl dev --no-build --app-id <app-id> --tunnel '<full Expo dev-client link>'
 ```
 
 ```
-Shell(command="export REVYL_CONTEXT=\"${REVYL_CONTEXT:-revyl-dev-loop}\" && revyl dev --context \"$REVYL_CONTEXT\" --no-build --app-id <app-id>", block_until_ms=0)
+Shell(command="revyl dev --no-build --app-id <app-id>", block_until_ms=0)
 AwaitShell(pattern="Dev loop ready", block_until_ms=120000)
 
 # Or attach to an existing context
 Shell(command="revyl dev list")
-Shell(command="revyl dev attach active --context default")
-Shell(command="revyl dev --context default", block_until_ms=0)
+Shell(command="revyl dev attach active --context <name>")
+Shell(command="revyl dev --context <name>", block_until_ms=0)
 AwaitShell(pattern="Dev loop ready", block_until_ms=120000)
 
 Shell(command="revyl device screenshot")
