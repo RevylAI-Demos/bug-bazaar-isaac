@@ -1,12 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/theme';
 
-function TabIcon({ focused, label }: { focused: boolean; label: string }) {
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+function TabIcon({
+  focused,
+  label,
+  icon,
+  activeIcon,
+}: {
+  focused: boolean;
+  label: string;
+  icon: IoniconName;
+  activeIcon: IoniconName;
+}) {
   return (
     <View style={styles.tabItem}>
-      <View style={[styles.tabIcon, focused && styles.tabIconActive]} />
+      <View style={[styles.tabIcon, focused && styles.tabIconActive]}>
+        <Ionicons
+          name={focused ? activeIcon : icon}
+          size={20}
+          color={focused ? Colors.paperWhite : Colors.gray}
+        />
+      </View>
       <Text style={[styles.tabLabel, focused && styles.tabLabelActive]} numberOfLines={1}>
         {label}
       </Text>
@@ -29,25 +48,53 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Shop" />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              label="Shop"
+              icon="storefront-outline"
+              activeIcon="storefront"
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Search" />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              label="Search"
+              icon="search-outline"
+              activeIcon="search"
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="specimens"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Specimens" />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              label="Specimens"
+              icon="bug-outline"
+              activeIcon="bug"
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon focused={focused} label="Account" />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              focused={focused}
+              label="Account"
+              icon="person-circle-outline"
+              activeIcon="person-circle"
+            />
+          ),
         }}
       />
     </Tabs>
@@ -80,6 +127,8 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 6,
     backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tabIconActive: {
     backgroundColor: Colors.stickerGreen,
