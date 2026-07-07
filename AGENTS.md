@@ -32,6 +32,9 @@ When developing or changing a feature in this repo, use the Revyl dev loop to ve
 
 First run a new build using `revyl build --remote` as this VM does not have native platform toolchains not present.
 
+- `revyl build --remote` runs `eas-cli build --local` on the Revyl runner, which requires an Expo account: it fails with "An Expo user account is required to proceed" unless an `EXPO_TOKEN` secret is set (pass it through with `revyl build --remote --env EXPO_TOKEN=$EXPO_TOKEN`). If `EXPO_TOKEN` is not configured, you cannot produce a fresh native build.
+- For JS/TS-only work you usually do NOT need a fresh build: run `revyl dev --no-build --platform ios --platform-key ios-dev` to reuse the latest registered iOS dev-client build and load current JS over the Revyl relay via hot reload. Rebuild only for native/config changes (which then needs `EXPO_TOKEN`).
+
 - Read and follow the local `revyl-cli-dev-loop` skill guidance before running Revyl commands.
 - This is an Expo dev-client app. Start with the Revyl-managed Expo loop from the repo root, using the existing `.revyl/config.yaml` when possible:
 
