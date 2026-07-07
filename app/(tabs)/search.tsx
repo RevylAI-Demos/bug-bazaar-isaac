@@ -26,7 +26,8 @@ export default function SearchScreen() {
       p =>
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
+        p.description.toLowerCase().includes(q) ||
+        p.badge?.toLowerCase().includes(q)
     );
   }, [query]);
 
@@ -119,7 +120,14 @@ export default function SearchScreen() {
                 </View>
                 <View style={styles.resultInfo}>
                   <Text style={styles.resultName}>{product.name}</Text>
-                  <Text style={styles.resultCategory}>{product.category}</Text>
+                  <View style={styles.resultMetaRow}>
+                    <Text style={styles.resultCategory}>{product.category}</Text>
+                    {product.badge && (
+                      <View style={styles.resultBadge}>
+                        <Text style={styles.resultBadgeText}>{product.badge}</Text>
+                      </View>
+                    )}
+                  </View>
                   <Text style={styles.resultPrice}>${product.price.toFixed(2)}</Text>
                 </View>
                 <TouchableOpacity
@@ -298,13 +306,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.inkBlack,
   },
+  resultMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
   resultCategory: {
     fontSize: 11,
     color: Colors.gray,
     fontFamily: Fonts.body,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginTop: 2,
+  },
+  resultBadge: {
+    backgroundColor: Colors.mangoOrange,
+    paddingVertical: 1,
+    paddingHorizontal: 6,
+    borderRadius: 5,
+  },
+  resultBadgeText: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    fontFamily: Fonts.body,
   },
   resultPrice: {
     fontSize: 13,
